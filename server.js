@@ -1,7 +1,6 @@
 //Dep Require
 var express = require("express")
 var app = express()
-var logger = require("morgan");
 var mongoose = require("mongoose");
 const path = require('path');
 
