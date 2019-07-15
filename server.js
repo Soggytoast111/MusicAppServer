@@ -14,6 +14,13 @@ app.use(express.json());
 var mongoURI = process.env.MONGODB_URI || "mongodb://localhost/musicApp"
 mongoose.connect(mongoURI, { useNewUrlParser: true });
 
+app.use((req, res, next) => {
+    res.append('Access-Control-Allow-Origin', ['*']);
+    res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.append('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
+
 // API routes
 require('./routes')(app);
 
