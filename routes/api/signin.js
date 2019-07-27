@@ -1,5 +1,6 @@
 const User = require('../../models/user.js')
 const UserSession = require('../../models/userSession.js')
+const Songs = require('../../models/songs.js')
 
 
 module.exports = (app) => {
@@ -70,6 +71,7 @@ module.exports = (app) => {
     })
 
     app.post('/api/account/signin', (req, res, next) => {
+        console.log(req.body)
         var { body } = req;
         var { 
             username,
@@ -117,6 +119,7 @@ module.exports = (app) => {
 
             userSession = new UserSession()
             userSession.userId = user._id
+            userSession.usernameRef = user._id
             userSession.username = user.username
             userSession.save((error, document) => {
                 if (error) {
@@ -142,7 +145,30 @@ module.exports = (app) => {
         UserSession.find({
             _id: token,
             isDeleted: false
-        }, (error, sessions) => {
+        }).populate({path : 'usernameRef', populate : {path : 'songRef'}})
+        .then(function(data){
+            console.log("here is your data:  ")
+            console.log(data[0].usernameRef.songRef)
+            res.json(
+                {
+                success: true,
+                userId: data[0].userId,
+                username: data[0].username,
+                message: 'Token Verified - go home',
+                songs: data[0].usernameRef.songRef
+                }
+            )
+        })
+        .catch(function(data){
+                return res.send({
+                    success: false,
+                    message: data
+                })
+        })
+    })
+        
+        /*
+        , (error, sessions) => {
             if (error) {
                 return res.send({
                     success: false,
@@ -166,7 +192,7 @@ module.exports = (app) => {
                 })
             }
         })
-    })
+    }) */
 
     app.get('/api/account/logout', (req, res, next) => {
         console.log("req coming in")
@@ -191,6 +217,44 @@ module.exports = (app) => {
                     message: 'Token marked as deleted! - redirect to login page'
                 })
             }
+        })
+    })
+
+    app.post('/api/song/create', (req, res, next) => {
+
+        const newSong = new Songs()
+            newSong.songId = "BlahblahID"
+            newSong.songJSONString = "TestString12e3"
+            console.log("You created a song!")
+            newSong.save(function(error, song){
+                res.send({
+                    success: true,
+                    message: 'did the thing...'
+                })
+                User.findOneAndUpdate({ username: "testuser123" }, 
+                   {$push:  { songRef: song._id }}, 
+                    null, (error, sessions) => {
+                    if (error) {
+                        return res.send({
+                            success: false,
+                            message: error
+                        })
+                    }}
+                    )
+            })
+        })
+
+
+    app.post('/api/test/return', (req, res, next) => {
+        User.findOne({ username: "testuser123"}).populate('songRef').then(function(data){
+            res.send(data)
+        })
+    })
+
+    app.post('/api/test/return2', (req, res, next) => {
+        UserSession.findOne({ username: "testuser123"}).populate({path : 'usernameRef', populate : {path : 'songRef'}})
+        .then(function(data){
+            res.send(data)
         })
     })
 }

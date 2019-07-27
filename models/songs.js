@@ -1,8 +1,7 @@
 var mongoose = require("mongoose");
-var bcrypt = require("bcrypt")
 
-var UserSessionSchema = new mongoose.Schema({
-    userId: {
+var Songs = new mongoose.Schema({
+    songId: {
         type: String,
         default: -1
     },
@@ -14,14 +13,14 @@ var UserSessionSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    username: {
+    songJSONString: {
         type: String,
-        default: "null---"
+        default: ""
     },
-    usernameRef: {
+    username: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
     }
 })
 
-module.exports = mongoose.model('UserSession', UserSessionSchema)
+module.exports = mongoose.model('Songs', Songs)

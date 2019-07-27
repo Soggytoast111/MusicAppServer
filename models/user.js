@@ -13,7 +13,11 @@ var UserSchema = new mongoose.Schema({
     isDeleted: {
         type: Boolean,
         default: false
-    }
+    },
+    songRef: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Songs"
+    }]
 })
 
 UserSchema.methods.generateHash = function(password) {
