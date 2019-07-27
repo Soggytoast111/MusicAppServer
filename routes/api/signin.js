@@ -221,17 +221,19 @@ module.exports = (app) => {
     })
 
     app.post('/api/song/create', (req, res, next) => {
-
+        var username = req.body.username
+        var songname = req.body.songname
+        var songJSON = req.body.songJSON
         const newSong = new Songs()
-            newSong.songId = "BlahblahID"
-            newSong.songJSONString = "TestString12e3"
+            newSong.songId = songname
+            newSong.songJSONString = songJSON
             console.log("You created a song!")
             newSong.save(function(error, song){
                 res.send({
                     success: true,
                     message: 'did the thing...'
                 })
-                User.findOneAndUpdate({ username: "testuser123" }, 
+                User.findOneAndUpdate({ username: username }, 
                    {$push:  { songRef: song._id }}, 
                     null, (error, sessions) => {
                     if (error) {
